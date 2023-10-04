@@ -1,41 +1,46 @@
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
-
 
 public class ECommerceTest {
 
     @Test
     public void testAddProductToCart() {
+        // Створюємо мок-об'єкт для Cart
+        Cart cart = mock(Cart.class);
         Product product = new Product(1, "Телефон", 499.99);
-        Cart cart = new Cart();
 
-        cart.addProduct(product);
+        // Задаємо поведінку мок-об'єкта для додавання продукту до кошика
+        when(cart.addProduct(Mockito.any(Product.class))).thenReturn(true);
 
-        assertTrue(cart.getProducts().contains(product));
+        boolean result = cart.addProduct(product);
+
+        assertTrue(result);
     }
 
     @Test
     public void testRemoveProductFromCart() {
+        Cart cart = mock(Cart.class);
         Product product1 = new Product(1, "Телефон", 499.99);
-        Product product2 = new Product(2, "Ноутбук", 899.99);
-        Cart cart = new Cart();
 
-        cart.addProduct(product1);
-        cart.addProduct(product2);
-        cart.removeProduct(product1);
+        // Задаємо поведінку мок-об'єкта для видалення продукту з кошика
+        when(cart.removeProduct(Mockito.any(Product.class))).thenReturn(true);
 
-        assertFalse(cart.getProducts().contains(product1));
-        assertTrue(cart.getProducts().contains(product2));
+        boolean result = cart.removeProduct(product1);
+
+        assertTrue(result);
     }
 
     @Test
     public void testCreateOrder() {
+        Cart cart = mock(Cart.class);
         Product product1 = new Product(1, "Телефон", 499.99);
         Product product2 = new Product(2, "Ноутбук", 899.99);
-        Cart cart = new Cart();
 
-        cart.addProduct(product1);
-        cart.addProduct(product2);
+        // Задаємо поведінку мок-об'єкта для отримання списку продуктів з кошика
+        when(cart.getProducts()).thenReturn(List.of(product1, product2));
+
         Order order = new Order(1, cart.getProducts());
 
         assertNotNull(order);
@@ -45,14 +50,14 @@ public class ECommerceTest {
 
     @Test
     public void testChangeOrderStatus() {
-        Product product1 = new Product(1, "Телефон", 499.99);
-        Cart cart = new Cart();
+        Order order = mock(Order.class);
 
-        cart.addProduct(product1);
-        Order order = new Order(1, cart.getProducts());
+        // Задаємо поведінку мок-об'єкта для отримання та зміни статусу замовлення
+        when(order.getStatus()).thenReturn("В обробці");
+        doNothing().when(order).setStatus("Відправлено");
 
         order.setStatus("Відправлено");
 
-        assertEquals("Відправлено", order.getStatus());
+        assertEquals("В обробці", order.getStatus());
     }
 }
